@@ -94,6 +94,25 @@
             outline: none;
         }
 
+        .pass-wrap {
+            position: relative;
+        }
+
+        .pass-wrap input {
+            width: 100%;
+            padding-right: 40px;
+        }
+
+        .pass-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            font-size: 15px;
+            user-select: none;
+        }
+
         .login-box button {
             padding: 12px;
             background: var(--primary);
@@ -629,7 +648,8 @@
             outline: none;
         }
 
-        #saveProfileBtn {
+        #saveProfileBtn,
+        #changePassBtn {
             padding: 11px 24px;
             background: #111;
             color: white;
@@ -652,7 +672,10 @@
             <label for="loginUser">Username</label>
             <input type="text" id="loginUser" placeholder="Username">
             <label for="loginPass">Password</label>
-            <input type="password" id="loginPass" placeholder="Password">
+            <div class="pass-wrap">
+                <input type="password" id="loginPass" placeholder="Password">
+                <span class="pass-toggle" id="loginPassToggle">👁</span>
+            </div>
             <div id="loginErr" class="form-msg err"></div>
             <button id="loginBtn">Login</button>
             <p>Don't have an account? <a href="#" id="goRegister">Register here</a></p>
@@ -665,7 +688,10 @@
             <label for="regUser">Username</label>
             <input type="text" id="regUser" placeholder="Username">
             <label for="regPass">Password</label>
-            <input type="password" id="regPass" placeholder="Password">
+            <div class="pass-wrap">
+                <input type="password" id="regPass" placeholder="Password">
+                <span class="pass-toggle" id="regPassToggle">👁</span>
+            </div>
             <div id="regErr" class="form-msg err"></div>
             <div id="regOk" class="form-msg ok"></div>
             <button id="registerBtn" class="btn-green">Register</button>
@@ -800,6 +826,35 @@
                     </div>
                     <button id="saveProfileBtn">Save Changes</button>
                 </div>
+
+                <div class="settings-box" style="margin-top:20px;">
+                    <h3>Change Password</h3>
+                    <div class="s-field" style="margin-bottom:16px;">
+                        <label for="currentPass">Current Password</label>
+                        <div class="pass-wrap">
+                            <input type="password" id="currentPass" placeholder="Current password">
+                            <span class="pass-toggle" id="currentPassToggle">👁</span>
+                        </div>
+                    </div>
+                    <div class="settings-fields">
+                        <div class="s-field">
+                            <label for="newPass">New Password</label>
+                            <div class="pass-wrap">
+                                <input type="password" id="newPass" placeholder="New password">
+                                <span class="pass-toggle" id="newPassToggle">👁</span>
+                            </div>
+                        </div>
+                        <div class="s-field">
+                            <label for="confirmPass">Confirm New Password</label>
+                            <div class="pass-wrap">
+                                <input type="password" id="confirmPass" placeholder="Confirm new password">
+                                <span class="pass-toggle" id="confirmPassToggle">👁</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="passMsg" class="form-msg err"></div>
+                    <button id="changePassBtn">Change Password</button>
+                </div>
             </div>
         </main>
 
@@ -888,8 +943,7 @@
         const cardInc = document.getElementById("cardInc")
         const cardExp = document.getElementById("cardExp")
         const cardCnt = document.getElementById("cardCnt")
-
-        /* ---------------- USER STORE (multi-user) ---------------- */
+        const changePassBtn = document.getElementById("changePassBtn")
 
         function getUsers() {
             const data = localStorage.getItem("ftp_users")
@@ -1309,6 +1363,47 @@
             alert('Settings saved!')
         }
 
+        function changePassword() {
+            const user = getCurrentUser()
+            const current = document.getElementById('currentPass').value
+            const newPass = document.getElementById('newPass').value
+            const confirm = document.getElementById('confirmPass').value
+            const msgEl = document.getElementById('passMsg')
+
+            const users = getUsers()
+
+            if (users[user] !== current) {
+                msgEl.textContent = "Current password is incorrect"
+                msgEl.className = "form-msg err"
+                msgEl.style.display = "block"
+                return
+            }
+
+            if (!newPass || newPass !== confirm) {
+                msgEl.textContent = "New password and confirm password must match"
+                msgEl.className = "form-msg err"
+                msgEl.style.display = "block"
+                return
+            }
+
+            users[user] = newPass
+            saveUsers(users)
+
+            msgEl.textContent = "Password changed successfully"
+            msgEl.className = "form-msg ok"
+            msgEl.style.display = "block"
+
+            document.getElementById('currentPass').value = ''
+            document.getElementById('newPass').value = ''
+            document.getElementById('confirmPass').value = ''
+        }
+
+        changePassBtn.addEventListener('click', changePassword)
+
+        setupPasswordToggle('currentPass', 'currentPassToggle')
+        setupPasswordToggle('newPass', 'newPassToggle')
+        setupPasswordToggle('confirmPass', 'confirmPassToggle')
+
         function resetAll() {
             const user = getCurrentUser()
             if (!confirm('Delete ALL data? This cannot be undone.')) return
@@ -1331,6 +1426,23 @@
         darkToggle.addEventListener('change', toggleDark)
         resetBtn.addEventListener('click', resetAll)
         saveProfileBtn.addEventListener('click', saveProfile)
+
+        function setupPasswordToggle(inputId, toggleId) {
+            const input = document.getElementById(inputId)
+            const toggle = document.getElementById(toggleId)
+            toggle.addEventListener('click', function () {
+                if (input.type === 'password') {
+                    input.type = 'text'
+                    toggle.textContent = '🙈'
+                } else {
+                    input.type = 'password'
+                    toggle.textContent = '👁'
+                }
+            })
+        }
+
+        setupPasswordToggle('loginPass', 'loginPassToggle')
+        setupPasswordToggle('regPass', 'regPassToggle')
 
         checkSession()
     </script>
