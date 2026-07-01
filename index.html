@@ -7,6 +7,7 @@
     <title>FinTrack Pro</title>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 
     <style>
         /* Light Mode Variables */
@@ -165,7 +166,18 @@
 
         .sidebar-logo {
             padding: 20px;
-            border-bottom: 1px solid var(--border);
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .sidebar-logo i {
+            font-size: 24px;
+        }
+
+        .sidebar-logo div {
+            /* border-bottom: 1px solid var(--border); */
             display: flex;
             flex-direction: column;
         }
@@ -191,13 +203,16 @@
         }
 
         .nav-item {
-            padding: 10px 14px;
+            padding: 14px 14px;
             border-radius: 8px;
             color: var(--text-secondary);
-            font-size: 14px;
+            font-size: 15px;
             font-weight: 500;
             cursor: pointer;
-            margin-bottom: 4px;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
         }
 
         .nav-item:hover {
@@ -205,7 +220,7 @@
         }
 
         .nav-item.active {
-            background: #eff6ff;
+            background: #d0e4ff;
             color: var(--primary);
         }
 
@@ -221,6 +236,11 @@
             font-family: inherit;
         }
 
+        #addTxBtn i {
+            margin-right: 5px;
+            font-size: 16px;
+        }
+
         /* Topbar */
         .topbar {
             position: fixed;
@@ -232,8 +252,14 @@
             border-bottom: 1px solid var(--border);
             display: flex;
             align-items: center;
-            justify-content: flex-end;
+            justify-content: space-between;
             padding: 0 24px;
+            /* gap: 50px; */
+        }
+
+        .topbar div {
+            display: flex;
+            align-items: center;
             gap: 14px;
         }
 
@@ -253,11 +279,21 @@
         #logoutBtn {
             padding: 8px 14px;
             border: 1px solid var(--border);
+            color: var(--text-secondary);
             border-radius: 8px;
             background: var(--surface);
             cursor: pointer;
             font-family: inherit;
             font-size: 13px;
+        }
+
+        #logoutBtn i {
+            margin-right: 5px;
+        }
+
+        #logoutBtn:hover {
+            background: var(--red);
+            color: white;
         }
 
         .main {
@@ -306,6 +342,48 @@
         .stat-icon {
             font-size: 22px;
             margin-bottom: 12px;
+            height: 40px;
+            width: 40px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .ctrBln {
+            background-color: #afc1fd;
+            font-size: 20px;
+        }
+
+        .ctrBln i {
+            color: var(--primary);
+        }
+
+        .totInc {
+            background-color: rgb(147, 255, 147);
+            font-size: 20px;
+        }
+
+        .totInc i {
+            color: var(--green);
+        }
+
+        .totExp {
+            background-color: rgb(255, 181, 181);
+            font-size: 20px;
+        }
+
+        .totExp i {
+            color: var(--red);
+        }
+
+        .totTx {
+            background-color: #afc1fd;
+            font-size: 20px;
+        }
+
+        .totTx i {
+            color: var(--primary);
         }
 
         .stat-label {
@@ -363,6 +441,10 @@
             font-family: inherit;
             font-size: 14px;
             font-weight: 600;
+        }
+
+        #resetBtn i {
+            margin-right: 5px;
         }
 
         .tx-card {
@@ -744,24 +826,30 @@
     <div id="app">
         <aside class="sidebar">
             <div class="sidebar-logo">
-                <span class="logo-title">FinTrack Pro</span>
-                <span class="logo-sub">Enterprise Finance</span>
+                <i class="fa-solid fa-layer-group"></i>
+                <div>
+                    <span class="logo-title">FinTrack Pro</span>
+                    <span class="logo-sub">Enterprise Finance</span>
+                </div>
             </div>
             <nav class="sidebar-nav">
-                <div class="nav-item" id="navDash">Dashboard</div>
-                <div class="nav-item" id="navSet">Settings</div>
+                <div class="nav-item" id="navDash"><i class="fa-solid fa-table-columns"></i>Dashboard</div>
+                <div class="nav-item" id="navSet"><i class="fa-solid fa-gear"></i>Settings</div>
             </nav>
             <div class="sidebar-bottom">
                 <button id="addTxBtn">
-                    + Add Transaction
+                    <i class="fa-solid fa-wallet"></i> 
+                    Add Transaction
                 </button>
             </div>
         </aside>
 
         <div class="topbar">
-            <div id="topbarAvatar" class="avatar"></div>
-            <span id="topbarName"></span>
-            <button id="logoutBtn">Logout</button>
+            <div>
+                <div id="topbarAvatar" class="avatar"></div>
+                <span id="topbarName"></span>
+            </div>
+            <button id="logoutBtn"><i class="fa-solid fa-right-from-bracket"></i>Logout</button>
         </div>
 
         <main class="main">
@@ -774,22 +862,22 @@
 
                 <div class="cards-row">
                     <div class="stat-card">
-                        <div class="stat-icon">🏦</div>
+                        <div class="stat-icon ctrBln"><i class="fa-solid fa-sack-dollar"></i></div>
                         <div class="stat-label">Current Balance</div>
                         <div class="stat-value" id="cardBal">₹0.00</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">📈</div>
+                        <div class="stat-icon totInc"><i class="fa-solid fa-arrow-trend-up"></i></div>
                         <div class="stat-label">Total Income</div>
-                        <div class="stat-value" id="cardInc">₹0.00</div>
+                        <div class="stat-value" id="cardInc" style="color: var(--green);">₹0.00</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">📉</div>
+                        <div class="stat-icon totExp"><i class="fa-solid fa-arrow-trend-down"></i></div>
                         <div class="stat-label">Total Expense</div>
-                        <div class="stat-value" id="cardExp">₹0.00</div>
+                        <div class="stat-value" id="cardExp" style="color: var(--red);">₹0.00</div>
                     </div>
                     <div class="stat-card">
-                        <div class="stat-icon">🐷</div>
+                        <div class="stat-icon totTx"><i class="fa-solid fa-receipt"></i></div>
                         <div class="stat-label">Total Transactions</div>
                         <div class="stat-value" id="cardCnt">0</div>
                     </div>
@@ -812,7 +900,7 @@
                                 <span class="slider"></span>
                             </label>
                         </div>
-                        <button id="resetBtn">Reset All Data</button>
+                        <button id="resetBtn"><i class="fa-solid fa-rotate-left"></i>Reset All Data</button>
                     </div>
                 </div>
 
