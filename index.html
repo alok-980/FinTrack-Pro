@@ -954,8 +954,13 @@
             regOk.textContent = "Account created! You can login now."
             regOk.style.display = "block"
 
-            regUser.value = ''
-            regPass.value = ''
+            setTimeout(function () {
+                showLoginScreen()
+                loginUser.value = username
+                loginPass.focus()
+                regUser.value = ''
+                regPass.value = ''
+            }, 1200)
         }
 
         function handleLogin() {
