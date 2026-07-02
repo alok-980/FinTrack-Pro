@@ -838,7 +838,7 @@
             </nav>
             <div class="sidebar-bottom">
                 <button id="addTxBtn">
-                    <i class="fa-solid fa-wallet"></i> 
+                    <i class="fa-solid fa-wallet"></i>
                     Add Transaction
                 </button>
             </div>
@@ -1246,6 +1246,7 @@
 
         let currentTxType = "income"
         let chartInstance = null
+        let editingTxId = null
 
         let currentPage = 1
         const itemsPerPage = 8
@@ -1266,6 +1267,10 @@
             document.getElementById('modalErr').style.display = 'none'
 
             setTxType("income")
+
+            editingTxId = null
+            document.querySelector('.modal-head h3').textContent = 'Add Transaction'
+            document.getElementById('saveTxBtn').textContent = 'Save Transaction'
         }
 
         function setTxType(type) {
@@ -1306,25 +1311,42 @@
                     return
                 }
 
-                if (amount > balance) {
-                    errEl.textContent = `Amount exceeds available balance (${formatAmount(balance)}).`
-                    errEl.style.display = 'block'
-                    return
+                // if (amount > balance) {
+                //     errEl.textContent = `Amount exceeds available balance (${formatAmount(balance)}).`
+                //     errEl.style.display = 'block'
+                //     return
+                // }
+            }
+
+            if (editingTxId !== null) {
+                const txs = getTransactions()
+                const updated = txs.map(function (tx) {
+                    if (tx.id === editingTxId) {
+                        return {
+                            ...tx,
+                            type: currentTxType,
+                            desc: desc,
+                            amount: amount,
+                            date: date,
+                            category: category
+                        }
+                    }
+                    return tx
+                })
+                saveTransaction(updated)
+            } else {
+                const newTx = {
+                    id: Date.now(),
+                    type: currentTxType,
+                    desc: desc,
+                    amount: amount,
+                    date: date,
+                    category: category
                 }
+                const txs = getTransactions()
+                txs.unshift(newTx)
+                saveTransaction(txs)
             }
-
-            const newTx = {
-                id: Date.now(),
-                type: currentTxType,
-                desc: desc,
-                amount: amount,
-                date: date,
-                category: category
-            }
-
-            const txs = getTransactions()
-            txs.unshift(newTx)
-            saveTransaction(txs)
 
             closeModal()
 
@@ -1485,6 +1507,11 @@
             <td>${tx.category}</td>
             <td style="color:${color};font-weight:600">${sign}${formatAmount(tx.amount)}</td>
             <td>
+                <button onclick="openEditModal(${tx.id})" 
+                    style="background:#eff6ff;color:var(--primary);border:1px solid #bfdbfe;
+                    padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;margin-right:4px;">
+                    Edit
+                </button>
                 <button onclick="deleteTx(${tx.id})" 
                     style="background:#fff5f5;color:var(--red);border:1px solid #fecaca;
                     padding:5px 10px;border-radius:6px;cursor:pointer;font-size:12px;">
@@ -1514,6 +1541,26 @@
         function goToPage(page) {
             currentPage = page
             renderTable()
+        }
+
+        function openEditModal(id) {
+            const txs = getTransactions()
+            const tx = txs.find(function (t) { return t.id === id })
+            if (!tx) return
+
+            editingTxId = id
+
+            document.querySelector('.modal-head h3').textContent = 'Edit Transaction'
+
+            document.getElementById('saveTxBtn').textContent = 'Update Transaction'
+
+            setTxType(tx.type)
+            document.getElementById('aDesc').value = tx.desc
+            document.getElementById('aAmt').value = tx.amount
+            document.getElementById('aDate').value = tx.date
+            document.getElementById('aCat').value = tx.category
+
+            document.getElementById('addModal').classList.add('open')
         }
 
         function deleteTx(id) {
