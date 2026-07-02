@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" />
 
     <style>
-        /* Light Mode Variables */
+        /* Light mode variables */
         :root {
             --bg: #f3f4f6;
             --surface: #ffffff;
@@ -24,7 +24,7 @@
             --topbar-h: 70px;
         }
 
-        /* Dark Mode Variables */
+        /* Dark mode variables */
         body.dark {
             --bg: #0f1117;
             --surface: #1a1d2e;
@@ -835,6 +835,9 @@
             <nav class="sidebar-nav">
                 <div class="nav-item" id="navDash"><i class="fa-solid fa-table-columns"></i>Dashboard</div>
                 <div class="nav-item" id="navSet"><i class="fa-solid fa-gear"></i>Settings</div>
+                <div class="nav-item" id="navData">
+                    <i class="fa-solid fa-database"></i>Data Management
+                </div>
             </nav>
             <div class="sidebar-bottom">
                 <button id="addTxBtn">
@@ -854,7 +857,6 @@
 
         <main class="main">
             <div id="pageDashboard" class="page">
-                <!-- Dashboard Content Here -->
                 <div class="dash-header">
                     <h1>Financial Overview</h1>
                     <p>Real-time tracking application</p>
@@ -933,7 +935,6 @@
             </div>
 
             <div id="pageSettings" class="page">
-                <!-- Settings Content Here -->
                 <div class="settings-header">
                     <h1>Settings</h1>
                     <p>Manage your account profile and app formatting.</p>
@@ -986,6 +987,52 @@
                     </div>
                     <div id="passMsg" class="form-msg err"></div>
                     <button id="changePassBtn">Change Password</button>
+                </div>
+            </div>
+
+            <div id="pageData" class="page">
+                <div class="settings-header">
+                    <h1>Data Management</h1>
+                    <p>Export, backup and restore your financial data.</p>
+                </div>
+
+                <div class="settings-box">
+                    <h3>Export as CSV</h3>
+                    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">
+                        Download all transactions as a spreadsheet. Opens in Excel or Google Sheets.
+                    </p>
+                    <button id="exportCsvBtn" style="padding:10px 20px;background:var(--green);
+            color:white;border:none;border-radius:8px;cursor:pointer;
+            font-family:inherit;font-weight:600;font-size:14px;">
+                        ⬇ Export as CSV
+                    </button>
+                </div>
+
+                <div class="settings-box" style="margin-top:20px;">
+                    <h3>Download Backup</h3>
+                    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">
+                        Download a full backup of your transactions as a JSON file.
+                    </p>
+                    <button id="exportJsonBtn" style="padding:10px 20px;background:var(--primary);
+            color:white;border:none;border-radius:8px;cursor:pointer;
+            font-family:inherit;font-weight:600;font-size:14px;">
+                        ⬇ Download Backup
+                    </button>
+                </div>
+
+                <div class="settings-box" style="margin-top:20px;">
+                    <h3>Import Backup</h3>
+                    <p style="font-size:13px;color:var(--text-secondary);margin-bottom:14px;">
+                        Restore transactions from a previously downloaded backup file.
+                    </p>
+                    <input type="file" id="importFile" accept=".json"
+                        style="font-size:13px;margin-bottom:12px;display:block;">
+                    <button id="importJsonBtn" style="padding:10px 20px;background:#111;
+            color:white;border:none;border-radius:8px;cursor:pointer;
+            font-family:inherit;font-weight:600;font-size:14px;">
+                        ⬆ Import Backup
+                    </button>
+                    <div id="importMsg" class="form-msg" style="display:none;margin-top:12px;"></div>
                 </div>
             </div>
         </main>
@@ -1076,13 +1123,14 @@
         const cardExp = document.getElementById("cardExp")
         const cardCnt = document.getElementById("cardCnt")
         const changePassBtn = document.getElementById("changePassBtn")
+        const navData = document.getElementById('navData')
 
-        function getUsers() {
+        const getUsers = () => {
             const data = localStorage.getItem("ftp_users")
             return data ? JSON.parse(data) : {}
         }
 
-        function saveUsers(users) {
+        const saveUsers = (users) => {
             localStorage.setItem("ftp_users", JSON.stringify(users))
         }
 
@@ -1206,16 +1254,21 @@
         function showPage(pageName) {
             document.getElementById("pageDashboard").classList.remove("active")
             document.getElementById("pageSettings").classList.remove("active")
+            document.getElementById("pageData").classList.remove("active")
 
             navDash.classList.remove("active")
             navSet.classList.remove("active")
+            navData.classList.remove("active")
 
             if (pageName === "dashboard") {
                 document.getElementById("pageDashboard").classList.add("active")
                 navDash.classList.add("active")
-            } else {
+            } else if (pageName === "settings") {
                 document.getElementById("pageSettings").classList.add("active")
                 navSet.classList.add("active")
+            } else if (pageName === "data") {
+                document.getElementById("pageData").classList.add("active")
+                navData.classList.add("active")
             }
         }
 
@@ -1227,7 +1280,6 @@
             topbarName.textContent = ''
         }
 
-        /* ---------------- PER-USER DATA ---------------- */
 
         function getTransactions() {
             const user = getCurrentUser()
@@ -1365,6 +1417,8 @@
             showPage("settings")
         })
 
+        navData.addEventListener('click', () => showPage('data'))
+
         addTxBtn.addEventListener('click', openModal)
         modalClose.addEventListener('click', closeModal)
         saveTxBtn.addEventListener('click', handleAddTransaction)
@@ -1409,8 +1463,6 @@
             cardExp.textContent = formatAmount(totalExpense)
             cardCnt.textContent = count
         }
-
-        /* ---------------- CHART ---------------- */
 
         function renderChart() {
             const { totalIncome, totalExpense } = getTotals()
@@ -1650,6 +1702,100 @@
             masterRefresh()
         }
 
+        function exportCSV() {
+            const txs = getTransactions()
+
+            if (txs.length === 0) {
+                alert('No transactions to export.')
+                return
+            }
+
+            const headers = ['Date', 'Description', 'Category', 'Type', 'Amount']
+
+            const rows = txs.map(function (tx) {
+                return [
+                    tx.date,
+                    '"' + tx.desc + '"',
+                    tx.category,
+                    tx.type,
+                    tx.amount
+                ].join(',')
+            })
+
+            const csvContent = [headers.join(','), ...rows].join('\n')
+
+            const blob = new Blob([csvContent], { type: 'text/csv' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'fintrack_transactions.csv'
+            a.click()
+            URL.revokeObjectURL(url)
+        }
+
+        function exportJSON() {
+            const user = getCurrentUser()
+            const txs = getTransactions()
+
+            const backup = {
+                exportedAt: new Date().toISOString(),
+                user: user,
+                transactions: txs
+            }
+
+            const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' })
+            const url = URL.createObjectURL(blob)
+            const a = document.createElement('a')
+            a.href = url
+            a.download = 'fintrack_backup.json'
+            a.click()
+            URL.revokeObjectURL(url)
+        }
+
+        function importJSON() {
+            const file = document.getElementById('importFile').files[0]
+            const msgEl = document.getElementById('importMsg')
+
+            if (!file) {
+                msgEl.textContent = 'Please select a backup file first.'
+                msgEl.className = 'form-msg err'
+                msgEl.style.display = 'block'
+                return
+            }
+
+            const reader = new FileReader()
+
+            reader.onload = function (e) {
+                try {
+                    const backup = JSON.parse(e.target.result)
+
+                    if (!backup.transactions || !Array.isArray(backup.transactions)) {
+                        throw new Error('Invalid backup file')
+                    }
+
+                    if (!confirm(`This will replace your current data with ${backup.transactions.length} transactions. Continue?`)) {
+                        return
+                    }
+
+                    saveTransaction(backup.transactions)
+                    masterRefresh()
+
+                    msgEl.textContent = `✓ ${backup.transactions.length} transactions imported successfully!`
+                    msgEl.className = 'form-msg ok'
+                    msgEl.style.display = 'block'
+
+                    document.getElementById('importFile').value = ''
+
+                } catch (err) {
+                    msgEl.textContent = 'Invalid backup file. Please use a valid FinTrack backup.'
+                    msgEl.className = 'form-msg err'
+                    msgEl.style.display = 'block'
+                }
+            }
+
+            reader.readAsText(file)
+        }
+
         function checkSession() {
             const user = getCurrentUser()
             const users = getUsers()
@@ -1664,6 +1810,9 @@
         darkToggle.addEventListener('change', toggleDark)
         resetBtn.addEventListener('click', resetAll)
         saveProfileBtn.addEventListener('click', saveProfile)
+        document.getElementById('exportCsvBtn').addEventListener('click', exportCSV)
+        document.getElementById('exportJsonBtn').addEventListener('click', exportJSON)
+        document.getElementById('importJsonBtn').addEventListener('click', importJSON)
 
         function setupPasswordToggle(inputId, toggleId) {
             const input = document.getElementById(inputId)
