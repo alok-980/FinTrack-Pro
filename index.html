@@ -14,7 +14,7 @@
         :root {
             --bg: #f3f4f6;
             --surface: #ffffff;
-            --border: #edeef1;
+            --border: #cccccc;
             --text: #111111;
             --text-secondary: #6b7280;
             --primary: #1d4ed8;
@@ -28,7 +28,7 @@
         body.dark {
             --bg: #0f1117;
             --surface: #1a1d2e;
-            --border: #2a2d3e;
+            --border: #363741;
             --text: #f1f5f9;
             --text-secondary: #94a3b8;
         }
@@ -66,7 +66,7 @@
             border: 1px solid var(--border);
             border-radius: 16px;
             padding: 40px;
-            width: 380px;
+            width: 420px;
             text-align: center;
             display: flex;
             flex-direction: column;
@@ -80,9 +80,9 @@
 
         .login-box label {
             text-align: left;
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 500;
+            /* color: var(--text-secondary); */
             margin-bottom: -8px;
         }
 
@@ -792,34 +792,36 @@
 
     <div id="loginScreen">
         <div class="login-box">
-            <h2>Welcome to FinTrack pro</h2>
+            <h2>Welcome Back</h2>
+            <span>Login to FinTrack Pro</span>
             <label for="loginUser">Username</label>
-            <input type="text" id="loginUser" placeholder="Username">
+            <input type="text" id="loginUser">
             <label for="loginPass">Password</label>
             <div class="pass-wrap">
-                <input type="password" id="loginPass" placeholder="Password">
+                <input type="password" id="loginPass">
                 <span class="pass-toggle" id="loginPassToggle">👁</span>
             </div>
             <div id="loginErr" class="form-msg err"></div>
             <button id="loginBtn">Login</button>
-            <p>Don't have an account? <a href="#" id="goRegister">Register here</a></p>
+            <p style="font-size: 14px;">Don't have an account? <a href="#" id="goRegister">Register here</a></p>
         </div>
     </div>
 
     <div id="registerScreen">
         <div class="login-box">
-            <h2>Create your account</h2>
-            <label for="regUser">Username</label>
-            <input type="text" id="regUser" placeholder="Username">
+            <h2>Create Account</h2>
+            <span>Join FinTrack Pro</span>
+            <label for="regUser">Choose a Username</label>
+            <input type="text" id="regUser">
             <label for="regPass">Password</label>
             <div class="pass-wrap">
-                <input type="password" id="regPass" placeholder="Password">
+                <input type="password" id="regPass">
                 <span class="pass-toggle" id="regPassToggle">👁</span>
             </div>
             <div id="regErr" class="form-msg err"></div>
             <div id="regOk" class="form-msg ok"></div>
             <button id="registerBtn" class="btn-green">Register</button>
-            <p>Already have an account? <a href="#" id="goLogin">Login here</a></p>
+            <p style="font-size: 14px;">Already have an account? <a href="#" id="goLogin">Login here</a></p>
         </div>
     </div>
 
